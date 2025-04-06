@@ -17,9 +17,11 @@ func TestLetStatements( t *testing.T) {
 	p := New(l)
 
 	program := p.ParseProgram()
+	checkParserErrors(t, p)
 	if program == nil {
 		t.Fatalf("ParserProgram() returned nil" )
 	}
+	
 
 	if len(program.Statements) != 3 {
 		t.Fatalf("program.Statements does not contain 3 statments. got=%d", len(program.Statements))
@@ -52,13 +54,28 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 		t.Errorf("s not *ast.Letstatment. got=%T", s)
 		return false
 	}
+
 	if letStmt.Name.Value != name {
 		t.Errorf("letStmt.Name.Value not '%s'. got=%s", name, letStmt.Name.Value)
 		return false
 	}
+
 	if letStmt.Name.TokenLiteral() != name {
 		t.Errorf(" letStmt.Name.TokenLiteral() not '%s'. got=%s", name, letStmt.TokenLiteral())
 		return false
 	}
+
 	return true
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+	if len(errors) == 0 {
+		return
+	}
+	t.Errorf("parser has %d errors", len(errors))
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+	t.FailNow()
 }
